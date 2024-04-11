@@ -13,8 +13,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-switch": "^1.0.3",
     "autoprefixer": "^10.4.18",
     "axios": "^1.6.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
     "gh-pages": "^6.1.1",
     "lucide-react": "^0.358.0",
     "postcss": "^8.4.35",
@@ -22,7 +26,9 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "styled-components": "^6.1.8",
-    "tailwindcss": "^3.4.1"
+    "tailwind-merge": "^2.2.2",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
