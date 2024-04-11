@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../components/ui/dialog";
+import { Switch } from "../components/ui/switch"
 
 interface Card {
   id: string;
@@ -100,7 +101,7 @@ export function Lib() {
         Alexandria
       </h1>
 
-      <nav>
+      <nav className="flex flex-row w-[800px] items-center justify-around">
         <form action="">
           <input
             type="text"
@@ -109,12 +110,32 @@ export function Lib() {
             className="my-3 w-[550px] h-8 rounded-sm indent-2 font-bold bg-orange-900 placeholder-orange-200 text-orange-200 placeholder-opacity-50 tracking-tight"
           />
         </form>
+        <Dialog>
+          <DialogTrigger><button className="bg-orange-900 w-[100px] h-8 font-bold rounded-sm text-orange-200">Filtros</button></DialogTrigger>
+          <DialogContent>
+              <DialogHeader>
+                <DialogTitle >
+                  <div className="w-full flex flex-col items-center"><p className="text-4xl text-orange-900">Filtros</p> <p className="text-xl text-orange-900">Selecione um ou mais filtos e pressione "Confirmar"!</p></div></DialogTitle>
+                <DialogDescription>
+                  <div className="w-full flex flex-row items-center justify-around text-xl text-orange-900 mt-4">
+                    <div className="flex flex-col items-center"><p>Black</p><Switch /></div>  
+                    <div className="flex flex-col items-center"><p>White</p><Switch /></div>
+                    <div className="flex flex-col items-center"><p>Red</p><Switch /></div>
+                    <div className="flex flex-col items-center"><p>Green</p><Switch /></div>
+                    <div className="flex flex-col items-center"><p>Blue</p><Switch /></div>
+                    
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+          </DialogContent>
+        </Dialog>
+        
       </nav>
-      <ul className="flex flex-wrap justify-center grid-cols-8 gap-6">
+      <ul className="flex flex-wrap justify-center grid-cols-8 gap-6 ">
         {queryCards.map((card) => (
           <Dialog key={card.id}>
             <DialogTrigger asChild>
-              <li className="w-[250px] flex flex-col justify-center items-center hover:mx-2 ease-in-out duration-150">
+              <li className="w-[250px] flex flex-col justify-center items-center hover:mx-1 ease-in-out duration-150 hover:cursor-pointer">
                 <img
                   src={card.imageUrl}
                   alt=""
@@ -126,28 +147,28 @@ export function Lib() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="text-5xl">
-                  <div className="flex flex-col">
+                  <div className="flex flex-col text-orange-900">
                     {card.name} <span className="text-2xl">{card.type}</span>
                   </div>
                 </DialogTitle>
                 <DialogDescription className="flex flex-row items-center">
-                  <div>
+                  <div className="text-orange-700">
                     <div className="flex flex-row justify-between w-[300px]">
-                      <p className="text-3xl mt-3">Mana Value: {card.cmc}</p>
+                      <p className="text-3xl mt-3"><span className="text-orange-900">Mana Value:</span> {card.cmc}</p>
                       <p className="text-3xl mt-3">
-                        Mana Cost: {card.manaCost}
+                        <span className="text-orange-900">Mana Cost:</span>  {card.manaCost}
                       </p>
                     </div>
                     <p className="text-3xl w-[300px] mt-3">
-                      Texto da Carta: <br />
+                      <span className="text-orange-900">Texto da Carta:</span> <br />
                       {card.originalText}
                     </p>
                     <div className="flex flex-row mt-3 w-[400px] justify-between">
-                      <p className="text-3xl">
-                        P/T: {card.power}/{card.toughness}
+                      <p className="text-3xl"><span className="text-orange-900">P/T:</span>
+                         {card.power}/{card.toughness}
                       </p>
-                      <p className="text-3xl">Expansion: {card.setName}</p>
-                      <p className="text-3xl">Rarity: {card.rarity}</p>
+                      <p className="text-3xl"><span className="text-orange-900">Expansion:</span> {card.setName}</p>
+                      <p className="text-3xl"><span className="text-orange-900">Rarity:</span>  {card.rarity}</p>
                     </div>
                   </div>
                   <img
