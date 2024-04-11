@@ -13,6 +13,14 @@ interface Card {
   id: string;
   name: string;
   imageUrl: string;
+  type: string;
+  cmc: string;
+  originalText: string;
+  power: string;
+  toughness: string;
+  setName: string;
+  rarity: string;
+  manaCost: string;
 }
 
 export function Lib() {
@@ -112,17 +120,41 @@ export function Lib() {
                   alt=""
                   className="rounded-[9px] hover:scale-125 ease-in-out duration-150 size-[350px]"
                 />
-
                 <p className="font-bold text-orange-900">{card.name}</p>
               </li>
             </DialogTrigger>
-
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Are you absolutely sure?</DialogTitle>
-                <DialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                <DialogTitle className="text-5xl">
+                  <div className="flex flex-col">
+                    {card.name} <span className="text-2xl">{card.type}</span>
+                  </div>
+                </DialogTitle>
+                <DialogDescription className="flex flex-row items-center">
+                  <div>
+                    <div className="flex flex-row justify-between w-[300px]">
+                      <p className="text-3xl mt-3">Mana Value: {card.cmc}</p>
+                      <p className="text-3xl mt-3">
+                        Mana Cost: {card.manaCost}
+                      </p>
+                    </div>
+                    <p className="text-3xl w-[300px] mt-3">
+                      Texto da Carta: <br />
+                      {card.originalText}
+                    </p>
+                    <div className="flex flex-row mt-3 w-[400px] justify-between">
+                      <p className="text-3xl">
+                        P/T: {card.power}/{card.toughness}
+                      </p>
+                      <p className="text-3xl">Expansion: {card.setName}</p>
+                      <p className="text-3xl">Rarity: {card.rarity}</p>
+                    </div>
+                  </div>
+                  <img
+                    className="rounded-lg size-[500px] mx-4"
+                    src={card.imageUrl}
+                    alt=""
+                  />
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>
