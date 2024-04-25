@@ -10,7 +10,7 @@ import {
 } from '../components/ui/dialog';
 
 import { Switch } from '../components/ui/switch';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
@@ -35,28 +35,34 @@ type Card = {
   setName: string;
   rarity: string;
   manaCost: string;
+  colors: string[];
 };
+
 export function Lib() {
   const [cards, setCards] = useState<Card[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [randomPlaceholder, setRandomPlaceholder] = useState('');
   const pageSize: number = 100;
+  const [filters, setFilters] = useState('');
 
   useEffect(() => {
+    console.log('FETCH');
     async function fetchData() {
       try {
         const response = await axios.get(
-          `https://api.magicthegathering.io/v1/cards?page=${currentPage}&pageSize=${pageSize}`
+          //filtra na requisição da API
+          `https://api.magicthegathering.io/v1/cards?page=${currentPage}&pageSize=${pageSize}${filters}`
         );
         const filteredCards = filterUniqueNames(response.data.cards);
         setCards((prevCards) => [...prevCards, ...filteredCards]);
+        console.log(response);
       } catch (error) {
         console.log('Error', error);
       }
     }
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, filters]);
 
   // Filter out cards with duplicate names
   const filterUniqueNames = (cards: Card[]) => {
@@ -118,16 +124,35 @@ export function Lib() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      filterRed: false,
-      filterBlue: false,
-      filterGreen: false,
-      filterBlack: false,
-      filterWhite: false,
+      filterRed: true,
+      filterBlue: true,
+      filterGreen: true,
+      filterBlack: true,
+      filterWhite: true,
     },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(JSON.stringify(data, null, 2));
+    // Initialize the filters array
+    let newFilters = [];
+
+    // Add the selected colors to the filters array
+    if (data.filterBlack) newFilters.push('B');
+    if (data.filterBlue) newFilters.push('U');
+    if (data.filterRed) newFilters.push('R');
+    if (data.filterGreen) newFilters.push('G');
+    if (data.filterWhite) newFilters.push('W');
+
+    // Construct the query string with the selected colors
+    const queryString =
+      newFilters.length > 0 ? `&colors=${newFilters.join('&')}` : '';
+
+    // Log the constructed query string
+    console.log(queryString);
+
+    // Set the filters state with the new query string
+    setCards([]);
+    setFilters(queryString);
   }
 
   return (
