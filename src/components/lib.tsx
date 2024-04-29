@@ -9,6 +9,15 @@ import {
   DialogTrigger,
 } from '../components/ui/dialog';
 
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '../components/ui/sheet';
+
 import { Switch } from '../components/ui/switch';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +30,12 @@ import {
   FormLabel,
 } from '../components/ui/form';
 import { Button } from '../components/ui/button';
+
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+import { CirclePlus, ShoppingCart } from 'lucide-react';
+
+import useLocalStorageState from 'use-local-storage-state';
 
 type Card = {
   id: string;
@@ -37,7 +52,9 @@ type Card = {
   colors: string[];
 };
 
-import InfiniteScroll from 'react-infinite-scroll-component';
+interface CartProps {
+  [cardId: string]: Card;
+}
 
 export function Lib() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -46,6 +63,7 @@ export function Lib() {
   const [randomPlaceholder, setRandomPlaceholder] = useState('');
   const pageSize: number = 100;
   const [filters, setFilters] = useState('');
+  const [cart, setCart] = useLocalStorageState<CartProps>('cart', {});
 
   useEffect(() => {
     console.log('FETCH');
@@ -148,6 +166,17 @@ export function Lib() {
     setFilters(queryString);
   }
 
+  const toCart = (card: Card): void => {
+    console.log(card.name);
+
+    setCart((prevCart) => ({
+      ...prevCart,
+      [card.id]: card,
+    }));
+
+    console.log(cart);
+  };
+
   return (
     <InfiniteScroll
       dataLength={cards.length} // This is important field to render the next data
@@ -161,9 +190,28 @@ export function Lib() {
       }
     >
       <div className="flex flex-col align-middle items-center">
-        <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase font-bold">
-          Alexandria
-        </h1>
+        <div className="flex items-center justify-center w-[90%]">
+          {' '}
+          <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase font-bold">
+            Alexandria
+          </h1>
+          <Sheet>
+            <SheetTrigger>
+              {' '}
+              <ShoppingCart className="stroke-orange-900 size-7 cursor-pointer" />
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Are you absolutely sure?</SheetTitle>
+                <SheetDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         <nav className="flex flex-row w-[800px] items-center justify-around">
           <form action="">
             <input
@@ -346,6 +394,10 @@ export function Lib() {
                           {card.rarity}
                         </p>
                       </div>
+                      <CirclePlus
+                        className="mt-4 size-7"
+                        onClick={() => toCart(card)}
+                      />
                     </div>
                     <img
                       className="rounded-lg size-[500px] mx-4"
