@@ -177,6 +177,8 @@ export function Lib() {
     console.log(cart);
   };
 
+  const getCards = () => Object.values(cart || {});
+
   return (
     <InfiniteScroll
       dataLength={cards.length} // This is important field to render the next data
@@ -206,6 +208,9 @@ export function Lib() {
                 <SheetDescription>
                   This action cannot be undone. This will permanently delete
                   your account and remove your data from our servers.
+                  {getCards().map((card) => (
+                    <div>{card.name}</div>
+                  ))}
                 </SheetDescription>
               </SheetHeader>
             </SheetContent>
