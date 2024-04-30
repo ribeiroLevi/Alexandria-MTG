@@ -18,6 +18,8 @@ import {
   SheetTrigger,
 } from '../components/ui/sheet';
 
+import { Toaster } from '../components/ui/toaster';
+
 import { Switch } from '../components/ui/switch';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,6 +38,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { CirclePlus, ShoppingCart } from 'lucide-react';
 
 import useLocalStorageState from 'use-local-storage-state';
+import { useToast } from './ui/use-toast';
 
 type Card = {
   id: string;
@@ -50,6 +53,7 @@ type Card = {
   rarity: string;
   manaCost: string;
   colors: string[];
+  quantity: number;
 };
 
 interface CartProps {
@@ -64,6 +68,7 @@ export function Lib() {
   const pageSize: number = 100;
   const [filters, setFilters] = useState('');
   const [cart, setCart] = useLocalStorageState<CartProps>('cart', {});
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log('FETCH');
@@ -169,12 +174,24 @@ export function Lib() {
   const toCart = (card: Card): void => {
     console.log(card.name);
 
+    if (card.quantity === undefined) {
+      card.quantity = 0;
+    } else {
+      card.quantity++;
+    }
+
     setCart((prevCart) => ({
       ...prevCart,
       [card.id]: card,
     }));
+    toast({
+      title: 'Carta Adicionada!',
+    });
+    console.log(cart, card.quantity);
+  };
 
-    console.log(cart);
+  const handleClearCart = () => {
+    setCart({});
   };
 
   const getCards = () => Object.values(cart || {});
@@ -204,19 +221,26 @@ export function Lib() {
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Are you absolutely sure?</SheetTitle>
+                <SheetTitle className="text-3xl font-Karantina">
+                  Lista
+                </SheetTitle>
                 <SheetDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
+                  <div className="mb-4">
+                    Aqui, você pode ver as cartas salvas do seu último deck e
+                    exportar um arquivo .txt com sua lista!
+                  </div>
                   {getCards().map((card) => (
-                    <div>{card.name}</div>
+                    <div>
+                      {card.quantity}
+                      {card.name}
+                    </div>
                   ))}
+                  <button onClick={handleClearCart}>CLEAR</button>
                 </SheetDescription>
               </SheetHeader>
             </SheetContent>
           </Sheet>
         </div>
-
         <nav className="flex flex-row w-[800px] items-center justify-around">
           <form action="">
             <input
@@ -416,6 +440,7 @@ export function Lib() {
           ))}
         </ul>
       </div>
+      <Toaster />
     </InfiniteScroll>
   );
 }
