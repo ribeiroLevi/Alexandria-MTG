@@ -21,7 +21,7 @@ import {
 import { Toaster } from '../components/ui/toaster';
 
 import { Switch } from '../components/ui/switch';
-import { z } from 'zod';
+import { map, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
@@ -39,6 +39,8 @@ import { CirclePlus, ShoppingCart } from 'lucide-react';
 
 import useLocalStorageState from 'use-local-storage-state';
 import { useToast } from './ui/use-toast';
+
+import { saveAs } from 'file-saver';
 
 type Card = {
   id: string;
@@ -175,7 +177,7 @@ export function Lib() {
     console.log(card.name);
 
     if (card.quantity === undefined) {
-      card.quantity = 0;
+      card.quantity = 1;
     } else {
       card.quantity++;
     }
@@ -194,13 +196,15 @@ export function Lib() {
     setCart({});
   };
 
+  const handleExportCart = () => {};
+
   const getCards = () => Object.values(cart || {});
 
   return (
     <InfiniteScroll
-      dataLength={cards.length} // This is important field to render the next data
-      next={loadMoreCards} // Pass the function that will load more data
-      hasMore={true} // Change this to false if there are no more records to be fetched
+      dataLength={cards.length}
+      next={loadMoreCards}
+      hasMore={true}
       loader={<h4 className="flex item-center">Loading...</h4>}
       endMessage={
         <p className="">
@@ -236,6 +240,9 @@ export function Lib() {
                     </div>
                   ))}
                   <button onClick={handleClearCart}>CLEAR</button>
+                  <button onClick={handleExportCart} id="export">
+                    EXPORT
+                  </button>
                 </SheetDescription>
               </SheetHeader>
             </SheetContent>
