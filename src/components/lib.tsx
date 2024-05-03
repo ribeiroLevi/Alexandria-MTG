@@ -21,9 +21,9 @@ import {
 import { Toaster } from '../components/ui/toaster';
 
 import { Switch } from '../components/ui/switch';
-import { map, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { get, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -39,8 +39,6 @@ import { CirclePlus, ShoppingCart } from 'lucide-react';
 
 import useLocalStorageState from 'use-local-storage-state';
 import { useToast } from './ui/use-toast';
-
-import { saveAs } from 'file-saver';
 
 type Card = {
   id: string;
@@ -199,16 +197,24 @@ export function Lib() {
   };
 
   const handleExportCart = (cards: Card[]) => {
-    const fileData = cards
-      .map((card) => `${card.quantity}x ${card.name}\n`)
-      .join('');
-    const blob = new Blob([fileData], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = 'list.txt';
-    link.href = url;
-    link.click();
-    console.log(fileData);
+    console.log(cards);
+    if (cards.length === 0) {
+      toast({
+        title: 'Você não possui cartas na lista ainda!',
+        variant: 'destructive',
+      });
+    } else {
+      const fileData = cards
+        .map((card) => `${card.quantity}x ${card.name}\n`)
+        .join('');
+      const blob = new Blob([fileData], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = 'list.txt';
+      link.href = url;
+      link.click();
+      console.log(fileData);
+    }
   };
 
   const getCards = () => Object.values(cart || {});
@@ -457,8 +463,10 @@ export function Lib() {
                         </p>
                       </div>
                       <CirclePlus
-                        className="mt-4 size-7 cursor-pointer"
-                        onClick={() => toCart(card)}
+                        className="mt-4 size-7 cursor-pointer fill-orange-900 stroke-orange-200"
+                        onClick={() => {
+                          toCart(card);
+                        }}
                       />
                     </div>
                     <img
