@@ -23,7 +23,7 @@ import { Toaster } from '../components/ui/toaster';
 import { Switch } from '../components/ui/switch';
 import { map, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { get, useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
@@ -186,9 +186,11 @@ export function Lib() {
       ...prevCart,
       [card.id]: card,
     }));
+
     toast({
-      title: 'Carta Adicionada!',
+      title: `Carta Adicionada: ${card.quantity}x ${card.name}`,
     });
+
     console.log(cart, card.quantity);
   };
 
@@ -196,7 +198,18 @@ export function Lib() {
     setCart({});
   };
 
-  const handleExportCart = () => {};
+  const handleExportCart = (cards: Card[]) => {
+    const fileData = cards
+      .map((card) => `${card.quantity}x ${card.name}\n`)
+      .join('');
+    const blob = new Blob([fileData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'list.txt';
+    link.href = url;
+    link.click();
+    console.log(fileData);
+  };
 
   const getCards = () => Object.values(cart || {});
 
@@ -225,24 +238,37 @@ export function Lib() {
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle className="text-3xl font-Karantina">
+                <SheetTitle className="text-5xl font-Karantina text-orange-900">
                   Lista
                 </SheetTitle>
                 <SheetDescription>
-                  <div className="mb-4">
+                  <div className="mb-4 text-xl text-orange-900">
                     Aqui, você pode ver as cartas salvas do seu último deck e
                     exportar um arquivo .txt com sua lista!
                   </div>
                   {getCards().map((card) => (
-                    <div>
-                      {card.quantity}
+                    <div className="text-xl text-orange-900">
+                      <span className="mr-1">{card.quantity}x</span>
                       {card.name}
                     </div>
                   ))}
-                  <button onClick={handleClearCart}>CLEAR</button>
-                  <button onClick={handleExportCart} id="export">
-                    EXPORT
-                  </button>
+                  <div className="flex gap-2 mt-8 text-orange-200 font-bold ">
+                    <button
+                      onClick={handleClearCart}
+                      className="border-orange-900 border-2 w-1/2 h-[40px] rounded-sm text-orange-900"
+                    >
+                      CLEAR
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleExportCart(getCards());
+                      }}
+                      className="bg-orange-900 w-1/2 rounded-sm"
+                      id="export"
+                    >
+                      EXPORT
+                    </button>
+                  </div>
                 </SheetDescription>
               </SheetHeader>
             </SheetContent>
@@ -431,7 +457,7 @@ export function Lib() {
                         </p>
                       </div>
                       <CirclePlus
-                        className="mt-4 size-7"
+                        className="mt-4 size-7 cursor-pointer"
                         onClick={() => toCart(card)}
                       />
                     </div>
