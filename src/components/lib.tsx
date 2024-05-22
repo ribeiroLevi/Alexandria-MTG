@@ -9,6 +9,17 @@ import {
   DialogTrigger,
 } from '../components/ui/dialog';
 
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '../components/ui/sheet';
+
+import { Toaster } from '../components/ui/toaster';
+
 import { Switch } from '../components/ui/switch';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +32,13 @@ import {
   FormLabel,
 } from '../components/ui/form';
 import { Button } from '../components/ui/button';
+
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+import { CirclePlus, ShoppingCart } from 'lucide-react';
+
+import useLocalStorageState from 'use-local-storage-state';
+import { useToast } from './ui/use-toast';
 
 type Card = {
   id: string;
@@ -35,9 +53,12 @@ type Card = {
   rarity: string;
   manaCost: string;
   colors: string[];
+  quantity: number;
 };
 
-import InfiniteScroll from 'react-infinite-scroll-component';
+interface CartProps {
+  [cardId: string]: Card;
+}
 
 export function Lib() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -46,6 +67,8 @@ export function Lib() {
   const [randomPlaceholder, setRandomPlaceholder] = useState('');
   const pageSize: number = 100;
   const [filters, setFilters] = useState('');
+  const [cart, setCart] = useLocalStorageState<CartProps>('cart', {});
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log('FETCH');
@@ -148,11 +171,59 @@ export function Lib() {
     setFilters(queryString);
   }
 
+  const toCart = (card: Card): void => {
+    console.log(card.name);
+
+    if (card.quantity === undefined) {
+      card.quantity = 1;
+    } else {
+      card.quantity++;
+    }
+
+    setCart((prevCart) => ({
+      ...prevCart,
+      [card.id]: card,
+    }));
+
+    toast({
+      title: `Carta Adicionada: ${card.quantity}x ${card.name}`,
+    });
+
+    console.log(cart, card.quantity);
+  };
+
+  const handleClearCart = () => {
+    setCart({});
+  };
+
+  const handleExportCart = (cards: Card[]) => {
+    console.log(cards);
+    if (cards.length === 0) {
+      toast({
+        title: 'Você não possui cartas na lista ainda!',
+        variant: 'destructive',
+      });
+    } else {
+      const fileData = cards
+        .map((card) => `${card.quantity}x ${card.name}\n`)
+        .join('');
+      const blob = new Blob([fileData], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = 'list.txt';
+      link.href = url;
+      link.click();
+      console.log(fileData);
+    }
+  };
+
+  const getCards = () => Object.values(cart || {});
+
   return (
     <InfiniteScroll
-      dataLength={cards.length} // This is important field to render the next data
-      next={loadMoreCards} // Pass the function that will load more data
-      hasMore={true} // Change this to false if there are no more records to be fetched
+      dataLength={cards.length}
+      next={loadMoreCards}
+      hasMore={true}
       loader={<h4 className="flex item-center">Loading...</h4>}
       endMessage={
         <p className="">
@@ -161,9 +232,54 @@ export function Lib() {
       }
     >
       <div className="flex flex-col align-middle items-center">
-        <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase font-bold">
-          Alexandria
-        </h1>
+        <div className="flex items-center justify-center w-[90%]">
+          {' '}
+          <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase font-bold">
+            Alexandria
+          </h1>
+          <Sheet>
+            <SheetTrigger>
+              {' '}
+              <ShoppingCart className="stroke-orange-900 size-7 cursor-pointer" />
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle className="text-5xl font-Karantina text-orange-900">
+                  Lista
+                </SheetTitle>
+                <SheetDescription>
+                  <div className="mb-4 text-xl text-orange-900">
+                    Aqui, você pode ver as cartas salvas do seu último deck e
+                    exportar um arquivo .txt com sua lista!
+                  </div>
+                  {getCards().map((card) => (
+                    <div className="text-xl text-orange-900">
+                      <span className="mr-1">{card.quantity}x</span>
+                      {card.name}
+                    </div>
+                  ))}
+                  <div className="flex gap-2 mt-8 text-orange-200 font-bold ">
+                    <button
+                      onClick={handleClearCart}
+                      className="border-orange-900 border-2 w-1/2 h-[40px] rounded-sm text-orange-900"
+                    >
+                      CLEAR
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleExportCart(getCards());
+                      }}
+                      className="bg-orange-900 w-1/2 rounded-sm"
+                      id="export"
+                    >
+                      EXPORT
+                    </button>
+                  </div>
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        </div>
         <nav className="flex flex-row w-[800px] items-center justify-around">
           <form action="">
             <input
@@ -346,6 +462,12 @@ export function Lib() {
                           {card.rarity}
                         </p>
                       </div>
+                      <CirclePlus
+                        className="mt-4 size-7 cursor-pointer fill-orange-900 stroke-orange-200"
+                        onClick={() => {
+                          toCart(card);
+                        }}
+                      />
                     </div>
                     <img
                       className="rounded-lg size-[500px] mx-4"
@@ -359,6 +481,7 @@ export function Lib() {
           ))}
         </ul>
       </div>
+      <Toaster />
     </InfiniteScroll>
   );
 }
