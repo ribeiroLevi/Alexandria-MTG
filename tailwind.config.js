@@ -1,3 +1,5 @@
+const { transform } = require('typescript');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
@@ -71,10 +73,21 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        'fade-up': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(30px) translateX(50px) Scale(0.9)',
+          },
+          to: {
+            opacity: '100',
+            transform: 'translateY(0px) translateX(0px) Scale(1)',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-up': 'fade-up 0.3s ease-in-out',
       },
     },
   },

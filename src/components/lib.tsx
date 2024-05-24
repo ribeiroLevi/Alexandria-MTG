@@ -219,6 +219,16 @@ export function Lib() {
 
   const getCards = () => Object.values(cart || {});
 
+  const handleCardListDelete = (card: Card) => {
+    if (card.quantity > 0) {
+      console.log('Clicou!', card.quantity);
+      card.quantity -= 1;
+    } else {
+      console.log('Acabou!');
+      setCart({});
+    }
+  };
+
   return (
     <InfiniteScroll
       dataLength={cards.length}
@@ -253,9 +263,17 @@ export function Lib() {
                     exportar um arquivo .txt com sua lista!
                   </div>
                   {getCards().map((card) => (
-                    <div className="text-xl text-orange-900">
-                      <span className="mr-1">{card.quantity}x</span>
-                      {card.name}
+                    <div className="flex w-full justify-between">
+                      <div className="text-xl text-orange-900">
+                        <span className="mr-1">{card.quantity}x</span>
+                        {card.name}{' '}
+                      </div>
+                      <span
+                        onClick={() => handleCardListDelete(card)}
+                        className="text-xl text-orange-900 cursor-pointer bold font-bold"
+                      >
+                        X
+                      </span>
                     </div>
                   ))}
                   <div className="flex gap-2 mt-8 text-orange-200 font-bold ">
