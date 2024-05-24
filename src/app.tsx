@@ -1,7 +1,6 @@
-import { Landing } from './components/landing';
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Lib } from './components/lib';
+import { Landing } from './components/landing';
 
 export function App() {
   return (
