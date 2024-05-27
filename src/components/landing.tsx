@@ -4,7 +4,7 @@ export function Landing() {
   return (
     <div className="h-screen w-screen overflow-hidden flex items-center flex-col">
       <img
-        src="public/alexandria.svg"
+        src="/ALEXANDRIA.svg"
         alt=""
         className="absolute w-screen bottom-0 "
       />
@@ -35,7 +35,7 @@ export function Landing() {
         </div>
         <div className="h-screen overflow-hidden">
           <img
-            src="public/chandra.png"
+            src="/chandra.png"
             alt="figura"
             className="w-[1000px] animate-fade-up duration-500"
           />
