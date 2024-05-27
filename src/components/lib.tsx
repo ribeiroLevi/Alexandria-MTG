@@ -174,16 +174,23 @@ export function Lib() {
   const toCart = (card: Card): void => {
     console.log(card.name);
 
-    if (card.quantity === undefined) {
-      card.quantity = 1;
-    } else {
-      card.quantity++;
-    }
+    setCart((prevCart) => {
+      const updatedCart = prevCart || {};
+      const existingCard = updatedCart[card.id];
 
-    setCart((prevCart) => ({
-      ...prevCart,
-      [card.id]: card,
-    }));
+      if (existingCard && existingCard.quantity === 0) {
+        card.quantity = 1;
+      } else if (!existingCard || existingCard.quantity === undefined) {
+        card.quantity = 1;
+      } else {
+        card.quantity = existingCard.quantity + 1;
+      }
+
+      return {
+        ...prevCart,
+        [card.id]: { ...card },
+      };
+    });
 
     toast({
       title: `Carta Adicionada: ${card.quantity}x ${card.name}`,
@@ -219,14 +226,29 @@ export function Lib() {
 
   const getCards = () => Object.values(cart || {});
 
-  const handleCardListDelete = (card: Card) => {
-    if (card.quantity > 0) {
-      console.log('Clicou!', card.quantity);
-      card.quantity -= 1;
-    } else {
-      console.log('Acabou!');
-      setCart({});
-    }
+  const handleCardListDelete = (card: Card): void => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart };
+
+      if (updatedCart[card.id] && updatedCart[card.id].quantity > 0) {
+        const updatedCard = {
+          ...updatedCart[card.id],
+          quantity: updatedCart[card.id].quantity - 1,
+        };
+
+        if (updatedCard.quantity > 0) {
+          updatedCart[card.id] = updatedCard;
+          console.log('Clicou!', updatedCard.quantity);
+        } else {
+          // Set the quantity to zero
+          card.quantity = 0;
+          console.log('Acabou!');
+          delete updatedCart[card.id];
+        }
+      }
+
+      return updatedCart;
+    });
   };
 
   return (
@@ -263,17 +285,29 @@ export function Lib() {
                     exportar um arquivo .txt com sua lista!
                   </div>
                   {getCards().map((card) => (
-                    <div className="flex w-full justify-between">
-                      <div className="text-xl text-orange-900">
-                        <span className="mr-1">{card.quantity}x</span>
-                        {card.name}{' '}
+                    <div className="group w-full">
+                      <div className="flex w-full justify-between mb-2">
+                        <div className="">
+                          <div className="text-xl text-orange-900">
+                            <span className="mr-1">{card.quantity}x</span>
+                            {card.name}{' '}
+                          </div>
+                        </div>
+
+                        <span
+                          onClick={() => {
+                            handleCardListDelete(card);
+                          }}
+                          className="text-xl text-orange-900 cursor-pointer bold font-bold select-none"
+                        >
+                          X
+                        </span>
                       </div>
-                      <span
-                        onClick={() => handleCardListDelete(card)}
-                        className="text-xl text-orange-900 cursor-pointer bold font-bold"
-                      >
-                        X
-                      </span>
+                      <img
+                        src={card.imageUrl}
+                        alt=""
+                        className="absolute left-500 hidden  group-hover:flex rounded-lg"
+                      />
                     </div>
                   ))}
                   <div className="flex gap-2 mt-8 text-orange-200 font-bold ">
