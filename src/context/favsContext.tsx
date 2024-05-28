@@ -11,7 +11,7 @@ export const favsContext = React.createContext<favsContextProps>({
   setFavorites: () => console.warn('Dispatch is not ready'),
 });
 
-export const FavsProvider: React.FC<{ children: ReactNode }> = ({
+export const FavsProvider: React.FC<{ children: ReactNode[] }> = ({
   children,
 }) => {
   const [favorites, setFavorites] = useState<Card[]>([]);

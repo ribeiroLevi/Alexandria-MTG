@@ -71,7 +71,7 @@ export function Lib() {
   const pageSize: number = 100;
   const [filters, setFilters] = useState('');
   const [cart, setCart] = useLocalStorageState<CartProps>('cart', {});
-  const { favorites, setFavorites } = useContext(favsContext);
+  const { setFavorites } = useContext(favsContext);
 
   const { toast } = useToast();
 
