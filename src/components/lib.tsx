@@ -1,4 +1,5 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
   Dialog,
@@ -35,12 +36,14 @@ import { Button } from '../components/ui/button';
 
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-import { CirclePlus, ShoppingCart } from 'lucide-react';
+import { CirclePlus, ShoppingCart, Heart } from 'lucide-react';
 
 import useLocalStorageState from 'use-local-storage-state';
 import { useToast } from './ui/use-toast';
 
-type Card = {
+import { favsContext } from '../context/favsContext';
+
+export type Card = {
   id: string;
   name: string;
   imageUrl: string;
@@ -68,6 +71,8 @@ export function Lib() {
   const pageSize: number = 100;
   const [filters, setFilters] = useState('');
   const [cart, setCart] = useLocalStorageState<CartProps>('cart', {});
+  const { favorites, setFavorites } = useContext(favsContext);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -240,7 +245,6 @@ export function Lib() {
           updatedCart[card.id] = updatedCard;
           console.log('Clicou!', updatedCard.quantity);
         } else {
-          // Set the quantity to zero
           card.quantity = 0;
           console.log('Acabou!');
           delete updatedCart[card.id];
@@ -248,6 +252,12 @@ export function Lib() {
       }
 
       return updatedCart;
+    });
+  };
+
+  const toFavs = (card: Card): void => {
+    setFavorites((prevCards) => {
+      return [...prevCards, card];
     });
   };
 
@@ -266,13 +276,16 @@ export function Lib() {
       <div className="flex flex-col align-middle items-center">
         <div className="flex items-center justify-center w-[90%]">
           {' '}
-          <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase font-bold">
+          <h1 className="mx-auto font-Karantina text-orange-900 text-5xl flex mt-5 mb-5 uppercase">
             Alexandria
           </h1>
+          <Link to={'/favs'}>
+            <Heart className="stroke-orange-900 size-7 cursor-pointer mr-3" />
+          </Link>
           <Sheet>
             <SheetTrigger>
               {' '}
-              <ShoppingCart className="stroke-orange-900 size-7 cursor-pointer" />
+              <ShoppingCart className="stroke-orange-900 size-7 cursor-pointer -mr-6" />
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
@@ -514,12 +527,20 @@ export function Lib() {
                           {card.rarity}
                         </p>
                       </div>
-                      <CirclePlus
-                        className="mt-4 size-7 cursor-pointer fill-orange-900 stroke-orange-200"
-                        onClick={() => {
-                          toCart(card);
-                        }}
-                      />
+                      <div className="flex mt-4 items-center gap-2">
+                        <CirclePlus
+                          className="size-7 cursor-pointer fill-orange-900 stroke-orange-200"
+                          onClick={() => {
+                            toCart(card);
+                          }}
+                        />
+                        <Heart
+                          className="cursor-pointer stroke-orange-900"
+                          onClick={() => {
+                            toFavs(card);
+                          }}
+                        />
+                      </div>
                     </div>
                     <img
                       className="rounded-lg size-[500px] mx-4"
